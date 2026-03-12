@@ -4,46 +4,56 @@
 	let selectedNode = $state<any>(null);
 	let activeRole = $state('all');
 	let showInstructions = $state(true);
-	let showCoreSummary = $state(false);
-	let lastCoreClickTime = 0;
-	let coreSummaryTimer: ReturnType<typeof setTimeout> | null = null;
+	let showSummary = $state<string | null>(null);
+	let lastRoleClickTime = 0;
+	let lastRoleClicked = '';
+	let summaryTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const roles = [
 		{ key: 'all', label: 'ALL', color: '#ffffff' },
 		{ key: 'commando', label: 'LTC', color: '#ff3333', description: 'Level The Curve — Access. Independence. Dignity. Improving accessibility and independence for people with disabilities.' },
-		{ key: 'ravager', label: 'RAV', color: '#33aaff' },
+		{ key: 'ravager', label: 'RAV', color: '#33aaff', description: 'LTC Foundation Corp — Empowering individuals without limits. A 501(c)(3) nonprofit removing barriers and expanding opportunities.' },
 		{ key: 'sentinel', label: 'SEN', color: '#ffd700' },
 		{ key: 'medic', label: 'MED', color: '#33ff88' },
 		{ key: 'synergist', label: 'SYN', color: '#bb44ff' },
 		{ key: 'saboteur', label: 'SAB', color: '#ff44aa' }
 	] as const;
 
+	const roleWebsites: Record<string, string> = {
+		commando: 'https://wolfwdavid.github.io/ltc.main/',
+		ravager: 'https://www.ltcfoundationcorp.com/'
+	};
+
 	function handleSelect(node: any) {
 		selectedNode = node;
 		if (showInstructions) showInstructions = false;
-		if (node?.role === 'commando') {
+		const role = node?.role;
+		if (role && role in roleWebsites) {
 			const now = Date.now();
-			if (now - lastCoreClickTime < 400) {
+			if (now - lastRoleClickTime < 400 && lastRoleClicked === role) {
 				// Double click — cancel summary and navigate to website
-				if (coreSummaryTimer) clearTimeout(coreSummaryTimer);
-				coreSummaryTimer = null;
-				lastCoreClickTime = 0;
-				showCoreSummary = false;
-				window.open('https://wolfwdavid.github.io/ltc.main/', '_blank');
+				if (summaryTimer) clearTimeout(summaryTimer);
+				summaryTimer = null;
+				lastRoleClickTime = 0;
+				lastRoleClicked = '';
+				showSummary = null;
+				window.open(roleWebsites[role], '_blank');
 			} else {
 				// First click — delay summary to allow double-click
-				lastCoreClickTime = now;
-				if (coreSummaryTimer) clearTimeout(coreSummaryTimer);
-				coreSummaryTimer = setTimeout(() => {
-					showCoreSummary = true;
-					coreSummaryTimer = null;
+				lastRoleClickTime = now;
+				lastRoleClicked = role;
+				if (summaryTimer) clearTimeout(summaryTimer);
+				summaryTimer = setTimeout(() => {
+					showSummary = role;
+					summaryTimer = null;
 				}, 400);
 			}
 		} else {
-			lastCoreClickTime = 0;
-			if (coreSummaryTimer) {
-				clearTimeout(coreSummaryTimer);
-				coreSummaryTimer = null;
+			lastRoleClickTime = 0;
+			lastRoleClicked = '';
+			if (summaryTimer) {
+				clearTimeout(summaryTimer);
+				summaryTimer = null;
 			}
 		}
 	}
@@ -141,46 +151,88 @@
 		</div>
 	{/if}
 
-	<!-- Core Summary Modal -->
-	{#if showCoreSummary}
-		<div class="summary-backdrop" onclick={() => (showCoreSummary = false)} role="presentation"></div>
-		<div class="summary-panel">
-			<button class="summary-close" onclick={() => (showCoreSummary = false)}>&times;</button>
-			<div class="summary-header">
-				<div class="summary-icon"></div>
-				<h2 class="summary-title">LEVEL THE CURVE</h2>
-				<p class="summary-tagline">Access. Independence. Dignity. Designing for all.</p>
-			</div>
-			<div class="summary-body">
-				<p>Level The Curve is a social enterprise focused on <strong>accessibility and disability inclusion</strong>. Founded by co-founders Stefan and Eli, the organization designs and manufactures adaptive products for people with disabilities.</p>
+	<!-- Summary Modals -->
+	{#if showSummary}
+		<div class="summary-backdrop" onclick={() => (showSummary = null)} role="presentation"></div>
 
-				<div class="summary-section">
-					<h3>Products</h3>
-					<p>The <strong>EZ Adapt</strong> product line features sleek, affordable devices that assist with Activities of Daily Living (ADLs), designed to maximize user independence.</p>
+		{#if showSummary === 'commando'}
+			<div class="summary-panel" style="--accent: #ff3333; --accent-glow: rgba(255, 51, 51, 0.5)">
+				<button class="summary-close" onclick={() => (showSummary = null)}>&times;</button>
+				<div class="summary-header">
+					<div class="summary-icon"></div>
+					<h2 class="summary-title">LEVEL THE CURVE</h2>
+					<p class="summary-tagline">Access. Independence. Dignity. Designing for all.</p>
 				</div>
+				<div class="summary-body">
+					<p>Level The Curve is a social enterprise focused on <strong>accessibility and disability inclusion</strong>. Founded by co-founders Stefan and Eli, the organization designs and manufactures adaptive products for people with disabilities.</p>
 
-				<div class="summary-section">
-					<h3>Services</h3>
-					<ul>
-						<li>Product consultations</li>
-						<li>Donation opportunities to support the mission</li>
-						<li>Newsletter updates on developments &amp; fundraisers</li>
-					</ul>
-				</div>
+					<div class="summary-section">
+						<h3>Products</h3>
+						<p>The <strong>EZ Adapt</strong> product line features sleek, affordable devices that assist with Activities of Daily Living (ADLs), designed to maximize user independence.</p>
+					</div>
 
-				<div class="summary-section">
-					<h3>Partners</h3>
-					<div class="summary-partners">
-						<span class="partner-tag">NYU Ability Project</span>
-						<span class="partner-tag">El Barrio's Artspace</span>
-						<span class="partner-tag">Mount Sinai Hospital</span>
+					<div class="summary-section">
+						<h3>Services</h3>
+						<ul>
+							<li>Product consultations</li>
+							<li>Donation opportunities to support the mission</li>
+							<li>Newsletter updates on developments &amp; fundraisers</li>
+						</ul>
+					</div>
+
+					<div class="summary-section">
+						<h3>Partners</h3>
+						<div class="summary-partners">
+							<span class="partner-tag">NYU Ability Project</span>
+							<span class="partner-tag">El Barrio's Artspace</span>
+							<span class="partner-tag">Mount Sinai Hospital</span>
+						</div>
 					</div>
 				</div>
+				<a class="summary-link" href="https://wolfwdavid.github.io/ltc.main/" target="_blank" rel="noopener noreferrer">
+					Visit Level The Curve
+				</a>
 			</div>
-			<a class="summary-link" href="https://wolfwdavid.github.io/ltc.main/" target="_blank" rel="noopener noreferrer">
-				Visit Level The Curve
-			</a>
-		</div>
+		{/if}
+
+		{#if showSummary === 'ravager'}
+			<div class="summary-panel" style="--accent: #33aaff; --accent-glow: rgba(51, 170, 255, 0.5)">
+				<button class="summary-close" onclick={() => (showSummary = null)}>&times;</button>
+				<div class="summary-header">
+					<div class="summary-icon"></div>
+					<h2 class="summary-title">LTC FOUNDATION CORP</h2>
+					<p class="summary-tagline">Empowering individuals without limits.</p>
+				</div>
+				<div class="summary-body">
+					<p><strong>LTC Foundation Corp</strong> is a registered 501(c)(3) nonprofit organization based in New York, focused on removing barriers and expanding opportunities for people facing challenges.</p>
+
+					<div class="summary-section">
+						<h3>Mission</h3>
+						<p>Empowering individuals without limits through community engagement, advocacy, and direct support programs.</p>
+					</div>
+
+					<div class="summary-section">
+						<h3>Get Involved</h3>
+						<ul>
+							<li>Community events and activities</li>
+							<li>Donate via integrated PayPal</li>
+							<li>Sign up for development &amp; fundraiser updates</li>
+						</ul>
+					</div>
+
+					<div class="summary-section">
+						<h3>Connect</h3>
+						<div class="summary-partners">
+							<span class="partner-tag">Instagram @levelthecurve</span>
+							<span class="partner-tag">LinkedIn</span>
+						</div>
+					</div>
+				</div>
+				<a class="summary-link" href="https://www.ltcfoundationcorp.com/" target="_blank" rel="noopener noreferrer">
+					Visit LTC Foundation Corp
+				</a>
+			</div>
+		{/if}
 	{/if}
 
 	<!-- Instructions -->
@@ -415,8 +467,8 @@
 		max-height: 80vh;
 		overflow-y: auto;
 		background: rgba(10, 8, 28, 0.92);
-		border: 1px solid rgba(255, 60, 60, 0.25);
-		border-top: 2px solid #ff3333;
+		border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+		border-top: 2px solid var(--accent);
 		backdrop-filter: blur(24px);
 		padding: 32px 36px;
 		z-index: 60;
@@ -450,7 +502,7 @@
 	}
 
 	.summary-close:hover {
-		color: #ff3333;
+		color: var(--accent);
 	}
 
 	.summary-header {
@@ -461,19 +513,19 @@
 	.summary-icon {
 		width: 14px;
 		height: 14px;
-		background: #ff3333;
+		background: var(--accent);
 		border-radius: 50%;
 		margin: 0 auto 14px;
-		box-shadow: 0 0 20px rgba(255, 51, 51, 0.5), 0 0 40px rgba(255, 51, 51, 0.2);
+		box-shadow: 0 0 20px var(--accent-glow), 0 0 40px color-mix(in srgb, var(--accent) 20%, transparent);
 	}
 
 	.summary-title {
 		font-size: 1.3rem;
 		font-weight: 300;
 		letter-spacing: 0.4em;
-		color: #ff3333;
+		color: var(--accent);
 		margin: 0 0 8px;
-		text-shadow: 0 0 20px rgba(255, 51, 51, 0.35);
+		text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent);
 	}
 
 	.summary-tagline {
@@ -508,10 +560,10 @@
 		font-weight: 500;
 		letter-spacing: 0.2em;
 		text-transform: uppercase;
-		color: rgba(255, 51, 51, 0.7);
+		color: color-mix(in srgb, var(--accent) 70%, transparent);
 		margin: 0 0 8px;
 		padding-bottom: 4px;
-		border-bottom: 1px solid rgba(255, 51, 51, 0.12);
+		border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
 	}
 
 	.summary-section ul {
@@ -530,8 +582,8 @@
 	}
 
 	.partner-tag {
-		background: rgba(255, 51, 51, 0.08);
-		border: 1px solid rgba(255, 51, 51, 0.15);
+		background: color-mix(in srgb, var(--accent) 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
 		padding: 4px 12px;
 		font-size: 0.7rem;
 		letter-spacing: 0.06em;
@@ -543,9 +595,9 @@
 		text-align: center;
 		margin-top: 24px;
 		padding: 10px 20px;
-		background: rgba(255, 51, 51, 0.1);
-		border: 1px solid rgba(255, 51, 51, 0.3);
-		color: #ff6b6b;
+		background: color-mix(in srgb, var(--accent) 10%, transparent);
+		border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+		color: var(--accent);
 		text-decoration: none;
 		font-size: 0.75rem;
 		letter-spacing: 0.12em;
@@ -553,10 +605,10 @@
 	}
 
 	.summary-link:hover {
-		background: rgba(255, 51, 51, 0.2);
-		border-color: #ff3333;
+		background: color-mix(in srgb, var(--accent) 20%, transparent);
+		border-color: var(--accent);
 		color: #fff;
-		box-shadow: 0 0 20px rgba(255, 51, 51, 0.15);
+		box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 15%, transparent);
 	}
 
 	/* Instructions */
