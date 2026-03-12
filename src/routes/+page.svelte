@@ -177,8 +177,8 @@
 					</div>
 				</div>
 			</div>
-			<a class="summary-link" href="https://www.levelthecurve.com/" target="_blank" rel="noopener noreferrer">
-				Visit levelthecurve.com
+			<a class="summary-link" href="https://wolfwdavid.github.io/ltc.main/" target="_blank" rel="noopener noreferrer">
+				Visit Level The Curve
 			</a>
 		</div>
 	{/if}
