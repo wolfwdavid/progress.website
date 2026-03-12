@@ -15,7 +15,7 @@
 		{ key: 'ravager', label: 'CORP', color: '#33aaff', description: 'LTC Foundation Corp — Empowering individuals without limits. A 501(c)(3) nonprofit removing barriers and expanding opportunities.' },
 		{ key: 'sentinel', label: 'MART', color: '#ffd700', description: 'LTC Market Place — The Accessible Marketplace. Buy and sell adaptive products, assistive technology, and accessible equipment at fair prices.' },
 		{ key: 'medic', label: 'PIL', color: '#33ff88', description: 'LTC Internship Pilot Program — A 10-week engineering internship designing assistive devices for people with disabilities.' },
-		{ key: 'synergist', label: 'SYN', color: '#bb44ff' },
+		{ key: 'synergist', label: 'PROD', color: '#bb44ff', description: 'LTC Products — Adaptive devices designed by Level The Curve to maximize independence for people with disabilities.' },
 		{ key: 'saboteur', label: 'SAB', color: '#ff44aa' }
 	] as const;
 
@@ -23,7 +23,8 @@
 		commando: 'https://wolfwdavid.github.io/ltc.main/',
 		ravager: 'https://www.ltcfoundationcorp.com/',
 		sentinel: 'https://wolfwdavid.github.io/ltc.marketplace/',
-		medic: '/LTC_Internship_Pilot_Program.pdf'
+		medic: '/LTC_Internship_Pilot_Program.pdf',
+		synergist: ''
 	};
 
 	function handleSelect(node: any) {
@@ -39,7 +40,7 @@
 				lastRoleClickTime = 0;
 				lastRoleClicked = '';
 				showSummary = null;
-				window.open(roleWebsites[role], '_blank');
+				if (roleWebsites[role]) window.open(roleWebsites[role], '_blank');
 			} else {
 				// First click — delay summary to allow double-click
 				lastRoleClickTime = now;
@@ -320,6 +321,46 @@
 				<a class="summary-link" href="/LTC_Internship_Pilot_Program.pdf" target="_blank" rel="noopener noreferrer">
 					View Full Program Document
 				</a>
+			</div>
+		{/if}
+
+		{#if showSummary === 'synergist'}
+			<div class="summary-panel" style="--accent: #bb44ff; --accent-glow: rgba(187, 68, 255, 0.5)">
+				<button class="summary-close" onclick={() => (showSummary = null)}>&times;</button>
+				<div class="summary-header">
+					<div class="summary-icon"></div>
+					<h2 class="summary-title">LTC PRODUCTS</h2>
+					<p class="summary-tagline">Adaptive devices designed for independence &amp; dignity.</p>
+				</div>
+				<div class="summary-body">
+					<p>The <strong>EZ Adapt</strong> product line by Level The Curve — affordable, sleek assistive devices that empower people with disabilities in their daily lives.</p>
+				</div>
+				<div class="product-grid">
+					<button class="product-node" style="--node-hue: 270">
+						<div class="product-node-orb"></div>
+						<span class="product-node-label">Eating Tool</span>
+					</button>
+					<button class="product-node" style="--node-hue: 290">
+						<div class="product-node-orb"></div>
+						<span class="product-node-label">Lawrence Chair</span>
+					</button>
+					<button class="product-node" style="--node-hue: 250">
+						<div class="product-node-orb"></div>
+						<span class="product-node-label">Universal Eating Tool</span>
+					</button>
+					<button class="product-node" style="--node-hue: 310">
+						<div class="product-node-orb"></div>
+						<span class="product-node-label">Vulcan Grip</span>
+					</button>
+					<button class="product-node" style="--node-hue: 230">
+						<div class="product-node-orb"></div>
+						<span class="product-node-label">Leg Bag</span>
+					</button>
+					<button class="product-node" style="--node-hue: 330">
+						<div class="product-node-orb"></div>
+						<span class="product-node-label">Manual Chair Ramp</span>
+					</button>
+				</div>
 			</div>
 		{/if}
 	{/if}
@@ -700,6 +741,66 @@
 		box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 15%, transparent);
 	}
 
+	/* Product Grid */
+	.product-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px;
+		margin-top: 24px;
+	}
+
+	.product-node {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		padding: 18px 10px;
+		background: rgba(187, 68, 255, 0.04);
+		border: 1px solid rgba(187, 68, 255, 0.12);
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+
+	.product-node:hover {
+		background: rgba(187, 68, 255, 0.1);
+		border-color: rgba(187, 68, 255, 0.4);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 20px rgba(187, 68, 255, 0.15);
+	}
+
+	.product-node-orb {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		background: radial-gradient(circle at 40% 35%,
+			hsl(var(--node-hue), 80%, 75%),
+			hsl(var(--node-hue), 70%, 45%)
+		);
+		box-shadow:
+			0 0 12px hsla(var(--node-hue), 80%, 60%, 0.5),
+			0 0 30px hsla(var(--node-hue), 80%, 60%, 0.2);
+		animation: orbPulse 3s ease-in-out infinite;
+	}
+
+	@keyframes orbPulse {
+		0%, 100% { box-shadow: 0 0 12px hsla(var(--node-hue), 80%, 60%, 0.5), 0 0 30px hsla(var(--node-hue), 80%, 60%, 0.2); }
+		50% { box-shadow: 0 0 18px hsla(var(--node-hue), 80%, 60%, 0.7), 0 0 40px hsla(var(--node-hue), 80%, 60%, 0.3); }
+	}
+
+	.product-node-label {
+		font-size: 0.68rem;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		color: rgba(255, 255, 255, 0.6);
+		text-align: center;
+		line-height: 1.3;
+	}
+
+	.product-node:hover .product-node-label {
+		color: rgba(255, 255, 255, 0.9);
+	}
+
 	/* Instructions */
 	.instructions {
 		position: absolute;
@@ -757,6 +858,10 @@
 		}
 		.summary-panel {
 			padding: 24px 20px;
+		}
+		.product-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 12px;
 		}
 	}
 </style>

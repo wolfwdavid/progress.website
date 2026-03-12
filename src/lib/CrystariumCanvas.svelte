@@ -247,6 +247,41 @@
 			});
 			connections.push([0, rcId]);
 
+			// Synergist (PROD) — 6 product nodes branching in different directions
+			if (role === 'synergist') {
+				const products = [
+					{ name: 'Eating Tool', desc: 'An adaptive utensil holder for individuals with limited grip strength.' },
+					{ name: 'Lawrence Chair', desc: 'A next-generation wheelchair designed for comfort and independence.' },
+					{ name: 'Universal Eating Tool', desc: 'A versatile eating device adaptable to multiple grip styles.' },
+					{ name: 'Vulcan Grip', desc: 'An ergonomic grip system for everyday objects and tools.' },
+					{ name: 'Leg Bag', desc: 'A discreet, accessible leg bag solution for daily use.' },
+					{ name: 'Manual Chair Ramp', desc: 'A portable ramp system for wheelchair accessibility.' }
+				];
+
+				const rcNode = nodes[rcId];
+				for (let pi = 0; pi < products.length; pi++) {
+					const prodAngle = baseAngle + (pi / products.length) * Math.PI * 2;
+					const prodR = 130;
+					const prodY = rcNode.y + Math.sin(prodAngle * 1.5 + pi) * 50;
+
+					const prodId = nid++;
+					nodes.push({
+						id: prodId,
+						x: rcNode.x + prodR * Math.cos(prodAngle),
+						y: prodY,
+						z: rcNode.z + prodR * Math.sin(prodAngle),
+						type: 'medium',
+						role,
+						label: products[pi].name,
+						description: products[pi].desc,
+						active: false,
+						connections: []
+					});
+					connections.push([rcId, prodId]);
+				}
+				continue;
+			}
+
 			let prevId = rcId;
 
 			// Main branch: 16 nodes spiraling outward
