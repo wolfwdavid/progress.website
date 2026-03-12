@@ -7,6 +7,8 @@
 	let { url, onclose }: { url: string; onclose?: () => void } = $props();
 
 	let container: HTMLDivElement;
+	let dimensions = $state<{ mm: { w: number; h: number; d: number }; in: { w: number; h: number; d: number } } | null>(null);
+	let unitSystem = $state<'SI' | 'Imperial'>('SI');
 
 	onMount(() => {
 		const width = container.clientWidth;
@@ -58,7 +60,28 @@
 		// Load STL
 		const loader = new STLLoader();
 		loader.load(url, (geometry) => {
+			// Rotate so Z-up (CAD) becomes Y-up (Three.js) — model stands upright
+			geometry.rotateX(-Math.PI / 2);
+
 			geometry.computeVertexNormals();
+			geometry.computeBoundingBox();
+
+			const box = geometry.boundingBox!;
+			const size = new THREE.Vector3();
+			box.getSize(size);
+
+			// Store real dimensions (STL units assumed mm)
+			const mmW = parseFloat(size.x.toFixed(1));
+			const mmH = parseFloat(size.y.toFixed(1));
+			const mmD = parseFloat(size.z.toFixed(1));
+			dimensions = {
+				mm: { w: mmW, h: mmH, d: mmD },
+				in: {
+					w: parseFloat((mmW / 25.4).toFixed(2)),
+					h: parseFloat((mmH / 25.4).toFixed(2)),
+					d: parseFloat((mmD / 25.4).toFixed(2))
+				}
+			};
 
 			const material = new THREE.MeshPhysicalMaterial({
 				color: 0x8855cc,
@@ -71,25 +94,24 @@
 
 			const mesh = new THREE.Mesh(geometry, material);
 
-			// Center and scale
-			geometry.computeBoundingBox();
-			const box = geometry.boundingBox!;
+			// Center the model, then sit it on the grid
 			const center = new THREE.Vector3();
 			box.getCenter(center);
 			mesh.position.sub(center);
+			// Shift up so the bottom rests on y=0
+			mesh.position.y += size.y / 2;
 
-			const size = new THREE.Vector3();
-			box.getSize(size);
 			const maxDim = Math.max(size.x, size.y, size.z);
 			const scale = 80 / maxDim;
 			mesh.scale.setScalar(scale);
+			mesh.position.multiplyScalar(scale);
 
 			scene.add(mesh);
 
 			// Fit camera
 			const dist = maxDim * scale * 1.6;
 			camera.position.set(dist * 0.6, dist * 0.5, dist * 0.8);
-			controls.target.set(0, 0, 0);
+			controls.target.set(0, size.y * scale * 0.35, 0);
 			controls.update();
 		});
 
@@ -129,6 +151,26 @@
 		<p class="stl-subtitle">Interactive 3D Model &mdash; Drag to rotate, scroll to zoom</p>
 	</div>
 	<div class="stl-container" bind:this={container}></div>
+
+	{#if dimensions}
+		<div class="stl-dimensions">
+			<div class="dim-toggle">
+				<button class="dim-btn" class:active={unitSystem === 'SI'} onclick={() => (unitSystem = 'SI')}>SI (mm)</button>
+				<button class="dim-btn" class:active={unitSystem === 'Imperial'} onclick={() => (unitSystem = 'Imperial')}>Imperial (in)</button>
+			</div>
+			<div class="dim-values">
+				{#if unitSystem === 'SI'}
+					<div class="dim-item"><span class="dim-label">W</span><span class="dim-val">{dimensions.mm.w} mm</span></div>
+					<div class="dim-item"><span class="dim-label">H</span><span class="dim-val">{dimensions.mm.h} mm</span></div>
+					<div class="dim-item"><span class="dim-label">D</span><span class="dim-val">{dimensions.mm.d} mm</span></div>
+				{:else}
+					<div class="dim-item"><span class="dim-label">W</span><span class="dim-val">{dimensions.in.w}"</span></div>
+					<div class="dim-item"><span class="dim-label">H</span><span class="dim-val">{dimensions.in.h}"</span></div>
+					<div class="dim-item"><span class="dim-label">D</span><span class="dim-val">{dimensions.in.d}"</span></div>
+				{/if}
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -208,15 +250,85 @@
 
 	.stl-container {
 		flex: 1;
-		margin: 8px 12px 12px;
+		margin: 8px 12px 0;
 		border-radius: 2px;
 		overflow: hidden;
+	}
+
+	/* Dimensions bar */
+	.stl-dimensions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 8px 16px;
+		margin: 0 12px 10px;
+		background: rgba(187, 68, 255, 0.05);
+		border: 1px solid rgba(187, 68, 255, 0.12);
+		border-radius: 2px;
+	}
+
+	.dim-toggle {
+		display: flex;
+		gap: 2px;
+	}
+
+	.dim-btn {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: rgba(255, 255, 255, 0.45);
+		padding: 3px 10px;
+		font-size: 0.62rem;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.dim-btn.active {
+		background: rgba(187, 68, 255, 0.15);
+		border-color: rgba(187, 68, 255, 0.4);
+		color: #bb44ff;
+	}
+
+	.dim-btn:hover {
+		border-color: rgba(187, 68, 255, 0.3);
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.dim-values {
+		display: flex;
+		gap: 16px;
+	}
+
+	.dim-item {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.dim-label {
+		font-size: 0.6rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: rgba(187, 68, 255, 0.6);
+	}
+
+	.dim-val {
+		font-size: 0.72rem;
+		font-weight: 400;
+		letter-spacing: 0.06em;
+		color: rgba(255, 255, 255, 0.7);
+		font-variant-numeric: tabular-nums;
 	}
 
 	@media (max-width: 768px) {
 		.stl-modal {
 			width: 96vw;
 			height: 70vh;
+		}
+		.stl-dimensions {
+			flex-direction: column;
+			gap: 8px;
 		}
 	}
 </style>
