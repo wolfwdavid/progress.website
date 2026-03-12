@@ -1,7 +1,10 @@
 <script lang="ts">
 	import CrystariumCanvas from '$lib/CrystariumCanvas.svelte';
+	import STLViewer from '$lib/STLViewer.svelte';
+	import { base } from '$app/paths';
 
 	let selectedNode = $state<any>(null);
+	let showSTLViewer = $state(false);
 	let activeRole = $state('all');
 	let showInstructions = $state(true);
 	let showSummary = $state<string | null>(null);
@@ -30,6 +33,13 @@
 	function handleSelect(node: any) {
 		selectedNode = node;
 		if (showInstructions) showInstructions = false;
+
+		// Open STL viewer when Eating Tool node is clicked
+		if (node?.label === 'Eating Tool' && node?.role === 'synergist') {
+			showSTLViewer = true;
+			return;
+		}
+
 		const role = node?.role;
 		if (role && role in roleWebsites) {
 			const now = Date.now();
@@ -336,9 +346,10 @@
 					<p>The <strong>EZ Adapt</strong> product line by Level The Curve — affordable, sleek assistive devices that empower people with disabilities in their daily lives.</p>
 				</div>
 				<div class="product-grid">
-					<button class="product-node" style="--node-hue: 270">
+					<button class="product-node" style="--node-hue: 270" onclick={() => { showSummary = null; showSTLViewer = true; }}>
 						<div class="product-node-orb"></div>
 						<span class="product-node-label">Eating Tool</span>
+						<span class="product-node-badge">3D</span>
 					</button>
 					<button class="product-node" style="--node-hue: 290">
 						<div class="product-node-orb"></div>
@@ -370,6 +381,11 @@
 		<div class="instructions">
 			<p>Drag to rotate &bull; Scroll to zoom &bull; Click nodes to crystallize</p>
 		</div>
+	{/if}
+
+	<!-- STL 3D Viewer -->
+	{#if showSTLViewer}
+		<STLViewer url="{base}/eating-tool.stl" onclose={() => (showSTLViewer = false)} />
 	{/if}
 </div>
 
@@ -799,6 +815,17 @@
 
 	.product-node:hover .product-node-label {
 		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.product-node-badge {
+		font-size: 0.55rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		padding: 1px 6px;
+		background: rgba(187, 68, 255, 0.2);
+		border: 1px solid rgba(187, 68, 255, 0.4);
+		color: #bb44ff;
+		border-radius: 2px;
 	}
 
 	/* Instructions */
