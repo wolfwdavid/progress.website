@@ -12,7 +12,7 @@
 	const roles = [
 		{ key: 'all', label: 'ALL', color: '#ffffff' },
 		{ key: 'commando', label: 'LTC', color: '#ff3333', description: 'Level The Curve — Access. Independence. Dignity. Improving accessibility and independence for people with disabilities.' },
-		{ key: 'ravager', label: 'RAV', color: '#33aaff', description: 'LTC Foundation Corp — Empowering individuals without limits. A 501(c)(3) nonprofit removing barriers and expanding opportunities.' },
+		{ key: 'ravager', label: 'CORP', color: '#33aaff', description: 'LTC Foundation Corp — Empowering individuals without limits. A 501(c)(3) nonprofit removing barriers and expanding opportunities.' },
 		{ key: 'sentinel', label: 'SEN', color: '#ffd700' },
 		{ key: 'medic', label: 'MED', color: '#33ff88' },
 		{ key: 'synergist', label: 'SYN', color: '#bb44ff' },
