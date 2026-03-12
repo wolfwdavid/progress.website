@@ -21,7 +21,7 @@
 	function handleSelect(node: any) {
 		selectedNode = node;
 		if (showInstructions) showInstructions = false;
-		if (node?.type === 'core') {
+		if (node?.role === 'commando') {
 			const now = Date.now();
 			if (now - lastCoreClickTime < 400) {
 				// Double click — cancel summary and navigate to website
