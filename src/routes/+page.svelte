@@ -6,6 +6,7 @@
 	let showInstructions = $state(true);
 	let showCoreSummary = $state(false);
 	let lastCoreClickTime = 0;
+	let coreSummaryTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const roles = [
 		{ key: 'all', label: 'ALL', color: '#ffffff' },
@@ -23,17 +24,27 @@
 		if (node?.type === 'core') {
 			const now = Date.now();
 			if (now - lastCoreClickTime < 400) {
-				// Double click — navigate to website
-				window.open('https://wolfwdavid.github.io/ltc.main/', '_blank');
+				// Double click — cancel summary and navigate to website
+				if (coreSummaryTimer) clearTimeout(coreSummaryTimer);
+				coreSummaryTimer = null;
 				lastCoreClickTime = 0;
 				showCoreSummary = false;
+				window.open('https://wolfwdavid.github.io/ltc.main/', '_blank');
 			} else {
-				// Single click — show summary
+				// First click — delay summary to allow double-click
 				lastCoreClickTime = now;
-				showCoreSummary = true;
+				if (coreSummaryTimer) clearTimeout(coreSummaryTimer);
+				coreSummaryTimer = setTimeout(() => {
+					showCoreSummary = true;
+					coreSummaryTimer = null;
+				}, 400);
 			}
 		} else {
 			lastCoreClickTime = 0;
+			if (coreSummaryTimer) {
+				clearTimeout(coreSummaryTimer);
+				coreSummaryTimer = null;
+			}
 		}
 	}
 
