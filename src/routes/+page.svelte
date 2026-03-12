@@ -13,15 +13,17 @@
 		{ key: 'all', label: 'ALL', color: '#ffffff' },
 		{ key: 'commando', label: 'LTC', color: '#ff3333', description: 'Level The Curve — Access. Independence. Dignity. Improving accessibility and independence for people with disabilities.' },
 		{ key: 'ravager', label: 'CORP', color: '#33aaff', description: 'LTC Foundation Corp — Empowering individuals without limits. A 501(c)(3) nonprofit removing barriers and expanding opportunities.' },
-		{ key: 'sentinel', label: 'SEN', color: '#ffd700' },
-		{ key: 'medic', label: 'MED', color: '#33ff88' },
+		{ key: 'sentinel', label: 'MART', color: '#ffd700', description: 'LTC Market Place — The Accessible Marketplace. Buy and sell adaptive products, assistive technology, and accessible equipment at fair prices.' },
+		{ key: 'medic', label: 'PIL', color: '#33ff88', description: 'LTC Internship Pilot Program — A 10-week engineering internship designing assistive devices for people with disabilities.' },
 		{ key: 'synergist', label: 'SYN', color: '#bb44ff' },
 		{ key: 'saboteur', label: 'SAB', color: '#ff44aa' }
 	] as const;
 
 	const roleWebsites: Record<string, string> = {
 		commando: 'https://wolfwdavid.github.io/ltc.main/',
-		ravager: 'https://www.ltcfoundationcorp.com/'
+		ravager: 'https://www.ltcfoundationcorp.com/',
+		sentinel: 'https://wolfwdavid.github.io/ltc.marketplace/',
+		medic: '/LTC_Internship_Pilot_Program.pdf'
 	};
 
 	function handleSelect(node: any) {
@@ -230,6 +232,93 @@
 				</div>
 				<a class="summary-link" href="https://www.ltcfoundationcorp.com/" target="_blank" rel="noopener noreferrer">
 					Visit LTC Foundation Corp
+				</a>
+			</div>
+		{/if}
+
+		{#if showSummary === 'sentinel'}
+			<div class="summary-panel" style="--accent: #ffd700; --accent-glow: rgba(255, 215, 0, 0.5)">
+				<button class="summary-close" onclick={() => (showSummary = null)}>&times;</button>
+				<div class="summary-header">
+					<div class="summary-icon"></div>
+					<h2 class="summary-title">LTC MARKET PLACE</h2>
+					<p class="summary-tagline">The Marketplace That Levels The Playing Field.</p>
+				</div>
+				<div class="summary-body">
+					<p><strong>LTC Market Place</strong> is an online marketplace created by the disability community, dedicated to buying and selling adaptive products, assistive technology, and accessible equipment at fair prices.</p>
+
+					<div class="summary-section">
+						<h3>Mission</h3>
+						<p>Combating the higher costs disabled individuals face when purchasing adaptive goods by providing an accessible, community-driven marketplace.</p>
+					</div>
+
+					<div class="summary-section">
+						<h3>Categories</h3>
+						<ul>
+							<li>Adaptive products &amp; assistive technology</li>
+							<li>Accessible equipment</li>
+							<li>Daily living aids</li>
+						</ul>
+					</div>
+
+					<div class="summary-section">
+						<h3>Features</h3>
+						<div class="summary-partners">
+							<span class="partner-tag">Buy &amp; Sell</span>
+							<span class="partner-tag">Fair Pricing</span>
+							<span class="partner-tag">Community Driven</span>
+						</div>
+					</div>
+				</div>
+				<a class="summary-link" href="https://wolfwdavid.github.io/ltc.marketplace/" target="_blank" rel="noopener noreferrer">
+					Visit LTC Market Place
+				</a>
+			</div>
+		{/if}
+
+		{#if showSummary === 'medic'}
+			<div class="summary-panel" style="--accent: #33ff88; --accent-glow: rgba(51, 255, 136, 0.5)">
+				<button class="summary-close" onclick={() => (showSummary = null)}>&times;</button>
+				<div class="summary-header">
+					<div class="summary-icon"></div>
+					<h2 class="summary-title">INTERNSHIP PILOT PROGRAM</h2>
+					<p class="summary-tagline">Assistive Device Design &amp; Adaptive Technology.</p>
+				</div>
+				<div class="summary-body">
+					<p>A <strong>10-week engineering internship</strong> where teams of 2–3 interns design, prototype, and validate new assistive devices — guided by LTC's lived-experience philosophy. Top projects may join the EZ Adapt product line.</p>
+
+					<div class="summary-section">
+						<h3>Program Details</h3>
+						<ul>
+							<li>Duration: 10 Weeks (June 2 – August 8)</li>
+							<li>Cohort: 6–10 Interns in teams of 2–3</li>
+							<li>Location: LTC Design Lab, New York, NY</li>
+							<li>Mentors: LTC Co-Founders + Licensed P.E. Advisors</li>
+						</ul>
+					</div>
+
+					<div class="summary-section">
+						<h3>Program Phases</h3>
+						<ul>
+							<li>Weeks 1–2: Research &amp; Problem Discovery</li>
+							<li>Weeks 3–4: Conceptual Design &amp; Engineering Analysis</li>
+							<li>Weeks 5–6: User Feedback &amp; Design Review</li>
+							<li>Weeks 7–8: Prototype Build &amp; Iterative Testing</li>
+							<li>Weeks 9–10: Documentation &amp; Capstone Pitch</li>
+						</ul>
+					</div>
+
+					<div class="summary-section">
+						<h3>Core Values</h3>
+						<div class="summary-partners">
+							<span class="partner-tag">Affordability (&le;$30)</span>
+							<span class="partner-tag">Equity</span>
+							<span class="partner-tag">Empowerment</span>
+						</div>
+					</div>
+				</div>
+				<a class="summary-link" href="/LTC_Internship_Pilot_Program.pdf" target="_blank" rel="noopener noreferrer">
+					View Full Program Document
 				</a>
 			</div>
 		{/if}
